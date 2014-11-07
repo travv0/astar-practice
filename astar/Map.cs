@@ -8,7 +8,7 @@ namespace astar
 {
     static class Map
     {
-        public const int width = 24, height = 200;
+        public const int width = 24, height = 70;
 
         public static void doThings(bool showCalc = false)
         {
