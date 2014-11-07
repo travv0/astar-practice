@@ -1,0 +1,12 @@
+c:\users\travis.sunderland\astar\astar\bin\Debug\astar.exe.config
+c:\users\travis.sunderland\astar\astar\obj\Debug\astar.csprojResolveAssemblyReference.cache
+c:\users\travis.sunderland\astar\astar\bin\Debug\astar.exe
+c:\users\travis.sunderland\astar\astar\bin\Debug\astar.pdb
+c:\users\travis.sunderland\astar\astar\obj\Debug\astar.exe
+c:\users\travis.sunderland\astar\astar\obj\Debug\astar.pdb
+F:\astar\astar\bin\Debug\astar.exe.config
+F:\astar\astar\obj\Debug\astar.exe
+F:\astar\astar\obj\Debug\astar.pdb
+F:\astar\astar\bin\Debug\astar.exe
+F:\astar\astar\bin\Debug\astar.pdb
+F:\astar\astar\obj\Debug\astar.csprojResolveAssemblyReference.cache
