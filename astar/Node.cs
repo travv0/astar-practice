@@ -22,7 +22,6 @@ namespace astar
         public Node Parent { get { return parent; } set { parent = value; } }
         public int F { get { return f; } set { f = value; } }
         public int G { get { return g; } set { g = value; } }
-        public int H { get { return h; } }
         public int X { get { return x; } }
         public int Y { get { return y; } }
 

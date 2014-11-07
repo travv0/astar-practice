@@ -8,10 +8,13 @@ namespace astar
 {
     static class Map
     {
-        public const int width = 24, height = 70;
+        public static int width, height;
 
-        public static void doThings(bool showCalc = false)
+        public static void doThings(int mapWidth, int mapHeight, bool showCalc = false)
         {
+            width = mapWidth;
+            height = mapHeight;
+
             Node[,] map = new Node[width, height];
 
             string draw = "";
@@ -103,9 +106,9 @@ namespace astar
                     if (showCalc == true)
                     {
                         draw = "";
-                        for (int i = 0; i < width; i++)
+                        for (int j = 0; j < height; j++)
                         {
-                            for (int j = 0; j < height; j++)
+                            for (int i = 0; i < width; i++)
                             {
                                 if (map[i, j] == startNode)
                                 {
@@ -148,9 +151,9 @@ namespace astar
             end:
 
             draw = "";
-            for (int i = 0; i < width; i++)
+            for (int j = 0; j < height; j++)
             {
-                for (int j = 0; j < height; j++)
+                for (int i = 0; i < width; i++)
                 {
                     if (map[i, j] == startNode)
                     {
@@ -182,10 +185,10 @@ namespace astar
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.R:
-                    doThings();
+                    doThings(width, height);
                     break;
                 case ConsoleKey.T:
-                    doThings(true);
+                    doThings(width, height, true);
                     break;
             }
         }

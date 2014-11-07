@@ -10,7 +10,12 @@ namespace astar
     {
         static void Main(string[] args)
         {
-            Map.doThings();
+            Console.Write("Enter width of map (make sure it will fit in the window!): ");
+            int width = Int32.Parse(Console.ReadLine());
+            Console.Write("Enter height of map (make sure it will fit in the window!): ");
+            int height = Int32.Parse(Console.ReadLine());
+
+            Map.doThings(width, height);
         }
     }
 }
