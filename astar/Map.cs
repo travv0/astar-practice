@@ -148,6 +148,10 @@ namespace astar
                                 {
                                     draw += ".";
                                 }
+                                else if (currentNode == map[i, j])
+                                {
+                                    draw += ",";
+                                }
                                 else
                                 {
                                     draw += "-";
@@ -157,7 +161,7 @@ namespace astar
                         }
                         Console.Clear();
                         Console.Write(draw);
-                        System.Threading.Thread.Sleep(10);
+                        System.Threading.Thread.Sleep(100);
                     }
                 }
 
