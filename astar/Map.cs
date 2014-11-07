@@ -10,7 +10,7 @@ namespace astar
     {
         public static int width, height;
 
-        public static void drawPath(int mapWidth, int mapHeight, bool showCalc = false, Node[,] mapToUse = null, List<Node> walls = null, Node start = null, Node end = null)
+        public static void drawPath(int mapWidth, int mapHeight, bool showCalc = false, bool showCurrPath = false, Node[,] mapToUse = null, List<Node> walls = null, Node start = null, Node end = null)
         {
             width = mapWidth;
             height = mapHeight;
@@ -136,9 +136,13 @@ namespace astar
                                 {
                                     draw += "|";
                                 }
+                                else if (showCurrPath && getPath(node).Contains(map[i, j]))
+                                {
+                                    draw += "O";
+                                }
                                 else if (openList.Contains(map[i, j]))
                                 {
-                                    draw += "o";
+                                    draw += ",";
                                 }
                                 else if (closedList.Contains(map[i, j]))
                                 {
@@ -185,6 +189,14 @@ namespace astar
                     {
                         draw += "O";
                     }
+                    else if (openList.Contains(map[i, j]) && showCalc && showCurrPath)
+                    {
+                        draw += ",";
+                    }
+                    else if (closedList.Contains(map[i, j]) && showCalc && showCurrPath)
+                    {
+                        draw += ".";
+                    }
                     else
                     {
                         draw += "-";
@@ -202,7 +214,10 @@ namespace astar
                     drawPath(width, height);
                     break;
                 case ConsoleKey.T:
-                    drawPath(width, height, true, map, wallList, startNode, endNode);
+                    drawPath(width, height, true, true, map, wallList, startNode, endNode);
+                    break;
+                case ConsoleKey.Y:
+                    drawPath(width, height, true, false, map, wallList, startNode, endNode);
                     break;
             }
         }
