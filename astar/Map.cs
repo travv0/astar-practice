@@ -10,48 +10,62 @@ namespace astar
     {
         public static int width, height;
 
-        public static void doThings(int mapWidth, int mapHeight, bool showCalc = false)
+        public static void drawPath(int mapWidth, int mapHeight, bool showCalc = false, Node[,] mapToUse = null, List<Node> walls = null, Node start = null, Node end = null)
         {
             width = mapWidth;
             height = mapHeight;
+            Node[,] map;
+            List<Node> wallList = walls;
+            Node startNode = start, endNode = end;
 
-            Node[,] map = new Node[width, height];
-
-            string draw = "";
-
-            List<Node> wallList = new List<Node>();
-
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    map[i, j] = new Node(i, j);
-                }
-            }
-            List<Node> path = new List<Node>();
+            Random r = new Random();
 
             List<Node> openList = new List<Node>();
             List<Node> closedList = new List<Node>();
 
-            Random r = new Random();
-
-            Node startNode = map[r.Next(width), r.Next(height)];
-            Node endNode = map[r.Next(width), r.Next(height)];
-
-            Node currentNode = startNode;
-
-            foreach (Node node in map)
+            if (mapToUse == null)
             {
-                if (r.Next(100) < 25 && node != startNode && node != endNode)
+                map = new Node[width, height];
+
+                wallList = new List<Node>();
+
+                for (int i = 0; i < width; i++)
                 {
-                    wallList.Add(node);
+                    for (int j = 0; j < height; j++)
+                    {
+                        map[i, j] = new Node(i, j);
+                    }
+                }
+
+                startNode = map[r.Next(width), r.Next(height)];
+                do
+                {
+                endNode = map[r.Next(width), r.Next(height)];
+                } while (endNode == startNode);
+                
+                foreach (Node node in map)
+                {
+                    if (r.Next(100) < 25 && node != startNode && node != endNode)
+                    {
+                        wallList.Add(node);
+                    }
                 }
             }
+            else
+            {
+                map = mapToUse;
+            }
+
+            string draw = "";
 
             foreach (Node wall in wallList)
             {
                 closedList.Add(wall);
             }
+            
+            List<Node> path = new List<Node>();
+
+            Node currentNode = startNode;
 
             if (!openList.Contains(startNode))
                 openList.Add(startNode);
@@ -180,15 +194,15 @@ namespace astar
             }
             Console.Clear();
             Console.Write(draw);
-            Console.Write("Press R to restart without showing work, T to restart and show work, or anything else to exit...");
+            Console.Write("Press R to show new map, T to show A* calculation, or anything else to exit...");
 
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.R:
-                    doThings(width, height);
+                    drawPath(width, height);
                     break;
                 case ConsoleKey.T:
-                    doThings(width, height, true);
+                    drawPath(width, height, true, map, wallList, startNode, endNode);
                     break;
             }
         }

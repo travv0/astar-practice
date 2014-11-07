@@ -15,7 +15,7 @@ namespace astar
             Console.Write("Enter height of map (make sure it will fit in the window!): ");
             int height = Int32.Parse(Console.ReadLine());
 
-            Map.doThings(width, height);
+            Map.drawPath(width, height);
         }
     }
 }
