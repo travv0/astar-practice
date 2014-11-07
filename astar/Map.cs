@@ -8,9 +8,9 @@ namespace astar
 {
     static class Map
     {
-        public const int width = 24, height = 70;
+        public const int width = 24, height = 200;
 
-        public static void doThings()
+        public static void doThings(bool showCalc = false)
         {
             Node[,] map = new Node[width, height];
 
@@ -100,41 +100,44 @@ namespace astar
                         goto end;
                     }
 
-                    draw = "";
-                    for (int i = 0; i < width; i++)
+                    if (showCalc == true)
                     {
-                        for (int j = 0; j < height; j++)
+                        draw = "";
+                        for (int i = 0; i < width; i++)
                         {
-                            if (map[i, j] == startNode)
+                            for (int j = 0; j < height; j++)
                             {
-                                draw += "S";
+                                if (map[i, j] == startNode)
+                                {
+                                    draw += "S";
+                                }
+                                else if (map[i, j] == endNode)
+                                {
+                                    draw += "E";
+                                }
+                                else if (wallList.Contains(map[i, j]))
+                                {
+                                    draw += "|";
+                                }
+                                else if (openList.Contains(map[i, j]))
+                                {
+                                    draw += "o";
+                                }
+                                else if (closedList.Contains(map[i, j]))
+                                {
+                                    draw += ".";
+                                }
+                                else
+                                {
+                                    draw += "-";
+                                }
                             }
-                            else if (map[i, j] == endNode)
-                            {
-                                draw += "E";
-                            }
-                            else if (wallList.Contains(map[i, j]))
-                            {
-                                draw += "|";
-                            }
-                            else if (openList.Contains(map[i, j]))
-                            {
-                                draw += "o";
-                            }
-                            else if (closedList.Contains(map[i, j]))
-                            {
-                                draw += ".";
-                            }
-                            else
-                            {
-                                draw += "-";
-                            }
+                            draw += "\n";
                         }
-                        draw += "\n";
+                        Console.Clear();
+                        Console.Write(draw);
+                        System.Threading.Thread.Sleep(10);
                     }
-                    Console.Clear();
-                    Console.Write(draw);
-                    System.Threading.Thread.Sleep(10);
                 }
 
 
@@ -174,11 +177,16 @@ namespace astar
             }
             Console.Clear();
             Console.Write(draw);
-            Console.Write("Press R to go again or anything else to exit...");
+            Console.Write("Press R to restart without showing work, T to restart and show work, or anything else to exit...");
 
-            if (Console.ReadKey().Key == ConsoleKey.R)
+            switch (Console.ReadKey().Key)
             {
-                doThings();
+                case ConsoleKey.R:
+                    doThings();
+                    break;
+                case ConsoleKey.T:
+                    doThings(true);
+                    break;
             }
         }
 
