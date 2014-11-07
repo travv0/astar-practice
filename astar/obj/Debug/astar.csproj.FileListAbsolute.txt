@@ -10,3 +10,9 @@ F:\astar\astar\obj\Debug\astar.pdb
 F:\astar\astar\bin\Debug\astar.exe
 F:\astar\astar\bin\Debug\astar.pdb
 F:\astar\astar\obj\Debug\astar.csprojResolveAssemblyReference.cache
+F:\astar\astar-practice\astar\bin\Debug\astar.exe.config
+F:\astar\astar-practice\astar\obj\Debug\astar.exe
+F:\astar\astar-practice\astar\obj\Debug\astar.pdb
+F:\astar\astar-practice\astar\bin\Debug\astar.exe
+F:\astar\astar-practice\astar\bin\Debug\astar.pdb
+F:\astar\astar-practice\astar\obj\Debug\astar.csprojResolveAssemblyReference.cache
