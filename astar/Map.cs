@@ -135,7 +135,7 @@ namespace astar
                     }
                     else if (showCalc)
                     {
-                        this.RenderMap(openList, closedList, currentNode, showCalc, showCurrPath);
+                        this.RenderMap(openList, closedList, currentNode, showCalc, showCurrPath, showCurrPath);
                         Thread.Sleep(10);
                     }
                 }
@@ -145,7 +145,7 @@ namespace astar
             }
 
             // render solved path
-            this.RenderMap(openList, closedList, currentNode, false, true);
+            this.RenderMap(openList, closedList, currentNode, true, true, showCurrPath);
 
             // reset console
             Console.ResetColor();
@@ -153,7 +153,7 @@ namespace astar
             Console.CursorVisible = true;
         }
 
-        private void RenderMap(List<Node> openList, List<Node> closedList, Node currentNode, bool showCalc, bool showCurrPath)
+        private void RenderMap(List<Node> openList, List<Node> closedList, Node currentNode, bool showCalc, bool showCurrPath, bool showLists)
         {
             List<Node> path = currentNode.GetPath();
 
@@ -177,11 +177,11 @@ namespace astar
                     {
                         this.WriteCharacter('O', x, y, ConsoleColor.White);
                     }
-                    else if (showCalc && openList.Contains(this.Nodes[x, y]))
+                    else if (showLists && showCalc && openList.Contains(this.Nodes[x, y]))
                     {
                         this.WriteCharacter(',', x, y);
                     }
-                    else if (showCalc && closedList.Contains(this.Nodes[x, y]))
+                    else if (showLists && showCalc && closedList.Contains(this.Nodes[x, y]))
                     {
                         this.WriteCharacter('.', x, y);
                     }
