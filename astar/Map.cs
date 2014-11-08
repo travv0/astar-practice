@@ -136,7 +136,7 @@ namespace astar
                     else if (showCalc)
                     {
                         this.RenderMap(openList, closedList, currentNode, showCalc, showCurrPath);
-                        Thread.Sleep(50);
+                        Thread.Sleep(10);
                     }
                 }
 
@@ -157,7 +157,6 @@ namespace astar
         {
             List<Node> path = currentNode.GetPath();
 
-            string drawStr = "";
             for (int x = 0; x < this.Width; x++)
             {
                 for (int y = 0; y < this.Height; y++)
@@ -172,7 +171,7 @@ namespace astar
                     }
                     else if (this.Nodes[x, y] is WallNode)
                     {
-                        this.WriteCharacter('|', x, y);
+                        this.WriteCharacter('*', x, y);
                     }
                     else if (showCurrPath && path.Contains(this.Nodes[x, y]))
                     {
@@ -188,7 +187,7 @@ namespace astar
                     }
                     else
                     {
-                        this.WriteCharacter('-', x, y);
+                        this.WriteCharacter('-', x, y, ConsoleColor.Black);
                     }
                 }
             }
@@ -230,7 +229,7 @@ namespace astar
             {
                 for (y = 0; y < this.Height; y++)
                 {
-                    if (Node.ReferenceEquals(this.Nodes[x,y], node))
+                    if (Node.ReferenceEquals(this.Nodes[x, y], node))
                         return;
                 }
             }
