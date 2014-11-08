@@ -11,10 +11,23 @@ namespace astar
         public static void Main(string[] args)
         {
             // get map size
-            Console.Write("Enter width of map (make sure it will fit in the window!): ");
-            int width = Int32.Parse(Console.ReadLine());
-            Console.Write("Enter height of map (make sure it will fit in the window!): ");
-            int height = Int32.Parse(Console.ReadLine());
+            int value, width = 0, height = 0;
+            while (width <= 0)
+            {
+                Console.Write("Enter width of map (make sure it will fit in the window!): ");
+                if (Int32.TryParse(Console.ReadLine(), out value))
+                {
+                    width = value;
+                }
+            }
+            while (height <= 0)
+            {
+                Console.Write("Enter height of map (make sure it will fit in the window!): ");
+                if (Int32.TryParse(Console.ReadLine(), out value))
+                {
+                    height = value;
+                }
+            }
 
             // draw first map
             Map map = new Map(width, height);
