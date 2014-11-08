@@ -162,11 +162,11 @@ namespace astar
                     {
                         drawStr += "O";
                     }
-                    else if (openList.Contains(this.Nodes[i, j]) && showCalc)
+                    else if (showCalc && openList.Contains(this.Nodes[i, j]))
                     {
                         drawStr += ",";
                     }
-                    else if (closedList.Contains(this.Nodes[i, j]) && showCalc)
+                    else if (showCalc && closedList.Contains(this.Nodes[i, j]))
                     {
                         drawStr += ".";
                     }
