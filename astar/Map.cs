@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace astar
@@ -40,9 +41,9 @@ namespace astar
                 startNode = map[r.Next(width), r.Next(height)];
                 do
                 {
-                endNode = map[r.Next(width), r.Next(height)];
+                    endNode = map[r.Next(width), r.Next(height)];
                 } while (endNode == startNode);
-                
+
                 foreach (Node node in map)
                 {
                     if (r.Next(100) < 25 && node != startNode && node != endNode)
@@ -56,13 +57,11 @@ namespace astar
                 map = mapToUse;
             }
 
-            string draw = "";
-
             foreach (Node wall in wallList)
             {
                 closedList.Add(wall);
             }
-            
+
             List<Node> path = new List<Node>();
 
             Node currentNode = startNode;
@@ -116,52 +115,11 @@ namespace astar
                         path = getPath(node);
                         goto end;
                     }
-
-                    if (showCalc == true)
+                    else if (showCalc == true)
                     {
-                        draw = "";
-                        for (int j = 0; j < height; j++)
-                        {
-                            for (int i = 0; i < width; i++)
-                            {
-                                if (map[i, j] == startNode)
-                                {
-                                    draw += "S";
-                                }
-                                else if (map[i, j] == endNode)
-                                {
-                                    draw += "E";
-                                }
-                                else if (wallList.Contains(map[i, j]))
-                                {
-                                    draw += "|";
-                                }
-                                else if (showCurrPath && getPath(node).Contains(map[i, j]))
-                                {
-                                    draw += "O";
-                                }
-                                else if (openList.Contains(map[i, j]))
-                                {
-                                    draw += ",";
-                                }
-                                else if (closedList.Contains(map[i, j]))
-                                {
-                                    draw += ".";
-                                }
-                                else if (currentNode == map[i, j])
-                                {
-                                    draw += ",";
-                                }
-                                else
-                                {
-                                    draw += "-";
-                                }
-                            }
-                            draw += "\n";
-                        }
-                        Console.Clear();
-                        Console.Write(draw);
-                        System.Threading.Thread.Sleep(100);
+                        path = getPath(node);
+                        draw(showCalc, showCurrPath, map, wallList, startNode, endNode, openList, closedList, path);
+                        Thread.Sleep(100);
                     }
                 }
 
@@ -170,46 +128,9 @@ namespace astar
                     closedList.Add(currentNode);
             }
 
-            end:
+        end:
 
-            draw = "";
-            for (int j = 0; j < height; j++)
-            {
-                for (int i = 0; i < width; i++)
-                {
-                    if (map[i, j] == startNode)
-                    {
-                        draw += "S";
-                    }
-                    else if (map[i, j] == endNode)
-                    {
-                        draw += "E";
-                    }
-                    else if (wallList.Contains(map[i, j]))
-                    {
-                        draw += "|";
-                    }
-                    else if (path.Contains(map[i, j]))
-                    {
-                        draw += "O";
-                    }
-                    else if (openList.Contains(map[i, j]) && showCalc && showCurrPath)
-                    {
-                        draw += ",";
-                    }
-                    else if (closedList.Contains(map[i, j]) && showCalc && showCurrPath)
-                    {
-                        draw += ".";
-                    }
-                    else
-                    {
-                        draw += "-";
-                    }
-                }
-                draw += "\n";
-            }
-            Console.Clear();
-            Console.Write(draw);
+            draw(showCalc, true, map, wallList, startNode, endNode, openList, closedList, path);
             Console.Write("Press R to show new map, T to show A* calculation, or anything else to exit...");
 
             switch (Console.ReadKey().Key)
@@ -226,7 +147,49 @@ namespace astar
             }
         }
 
-        static List<Node> getPath(Node node)
+        private static void draw(bool showCalc, bool showCurrPath, Node[,] map, List<Node> wallList, Node startNode, Node endNode, List<Node> openList, List<Node> closedList, List<Node> path)
+        {
+            string drawStr = "";
+            for (int j = 0; j < height; j++)
+            {
+                for (int i = 0; i < width; i++)
+                {
+                    if (map[i, j] == startNode)
+                    {
+                        drawStr += "S";
+                    }
+                    else if (map[i, j] == endNode)
+                    {
+                        drawStr += "E";
+                    }
+                    else if (wallList.Contains(map[i, j]))
+                    {
+                        drawStr += "|";
+                    }
+                    else if (showCurrPath && path.Contains(map[i, j]))
+                    {
+                        drawStr += "O";
+                    }
+                    else if (openList.Contains(map[i, j]) && showCalc)
+                    {
+                        drawStr += ",";
+                    }
+                    else if (closedList.Contains(map[i, j]) && showCalc)
+                    {
+                        drawStr += ".";
+                    }
+                    else
+                    {
+                        drawStr += "-";
+                    }
+                }
+                drawStr += "\n";
+            }
+            Console.Clear();
+            Console.Write(drawStr);
+        }
+
+        private static List<Node> getPath(Node node)
         {
             List<Node> path = new List<Node>();
             Node tempNode = node;
