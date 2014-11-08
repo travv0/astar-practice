@@ -10,6 +10,7 @@ namespace astar
     public class Map
     {
         public Node[,] Nodes { get; private set; }
+        public char[,] Display { get; private set; }
         public int Width { get { return this.Nodes.GetLength(0); } }
         public int Height { get { return this.Nodes.GetLength(1); } }
 
@@ -18,9 +19,9 @@ namespace astar
             this.Nodes = new Node[width, height];
 
             // initialize with empty nodes
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; ++y)
+                for (int y = 0; y < height; y++)
                 {
                     this.Nodes[x, y] = new Node();
                 }
@@ -42,9 +43,9 @@ namespace astar
             this.Nodes[endX, endY] = new EndNode();
 
             // random walls
-            for (int x = 0; x < width; ++x)
+            for (int x = 0; x < width; x++)
             {
-                for (int y = 0; y < height; ++y)
+                for (int y = 0; y < height; y++)
                 {
                     if ((random.Next(100) < 25) && !(this.Nodes[x, y] is StartNode) && !(this.Nodes[x, y] is EndNode))
                     {
@@ -56,6 +57,12 @@ namespace astar
 
         public void FindPath(bool showCalc = false, bool showCurrPath = false)
         {
+            // clear console
+            Console.Clear();
+            Console.CursorVisible = false;
+            this.Display = new char[this.Width, this.Height];
+
+            // track open and closed list
             List<Node> openList = new List<Node>();
             List<Node> closedList = new List<Node>();
 
@@ -76,7 +83,8 @@ namespace astar
             if (!openList.Contains(startNode))
                 openList.Add(startNode);
 
-            while (openList.Count > 0)
+            bool done = false;
+            while (!done && (openList.Count > 0))
             {
                 int smallestF = Int32.MaxValue;
                 foreach (Node node in openList)
@@ -122,19 +130,27 @@ namespace astar
 
                     if (Node.ReferenceEquals(node, endNode))
                     {
-                        this.RenderMap(openList, closedList, currentNode, false, true);
-                        return;
+                        done = true;
+                        break;
                     }
                     else if (showCalc)
                     {
                         this.RenderMap(openList, closedList, currentNode, showCalc, showCurrPath);
-                        Thread.Sleep(100);
+                        Thread.Sleep(50);
                     }
                 }
 
                 if (!closedList.Contains(currentNode))
                     closedList.Add(currentNode);
             }
+
+            // render solved path
+            this.RenderMap(openList, closedList, currentNode, false, true);
+
+            // reset console
+            Console.ResetColor();
+            Console.SetCursorPosition(0, this.Height);
+            Console.CursorVisible = true;
         }
 
         private void RenderMap(List<Node> openList, List<Node> closedList, Node currentNode, bool showCalc, bool showCurrPath)
@@ -142,43 +158,51 @@ namespace astar
             List<Node> path = currentNode.GetPath();
 
             string drawStr = "";
-            for (int j = 0; j < this.Height; j++)
+            for (int x = 0; x < this.Width; x++)
             {
-                for (int i = 0; i < this.Width; i++)
+                for (int y = 0; y < this.Height; y++)
                 {
-                    if (this.Nodes[i, j] is StartNode)
+                    if (this.Nodes[x, y] is StartNode)
                     {
-                        drawStr += "S";
+                        this.WriteCharacter('S', x, y, ConsoleColor.Green);
                     }
-                    else if (this.Nodes[i, j] is EndNode)
+                    else if (this.Nodes[x, y] is EndNode)
                     {
-                        drawStr += "E";
+                        this.WriteCharacter('E', x, y, ConsoleColor.Red);
                     }
-                    else if (this.Nodes[i, j] is WallNode)
+                    else if (this.Nodes[x, y] is WallNode)
                     {
-                        drawStr += "|";
+                        this.WriteCharacter('|', x, y);
                     }
-                    else if (showCurrPath && path.Contains(this.Nodes[i, j]))
+                    else if (showCurrPath && path.Contains(this.Nodes[x, y]))
                     {
-                        drawStr += "O";
+                        this.WriteCharacter('O', x, y, ConsoleColor.White);
                     }
-                    else if (showCalc && openList.Contains(this.Nodes[i, j]))
+                    else if (showCalc && openList.Contains(this.Nodes[x, y]))
                     {
-                        drawStr += ",";
+                        this.WriteCharacter(',', x, y);
                     }
-                    else if (showCalc && closedList.Contains(this.Nodes[i, j]))
+                    else if (showCalc && closedList.Contains(this.Nodes[x, y]))
                     {
-                        drawStr += ".";
+                        this.WriteCharacter('.', x, y);
                     }
                     else
                     {
-                        drawStr += "-";
+                        this.WriteCharacter('-', x, y);
                     }
                 }
-                drawStr += "\n";
             }
-            Console.Clear();
-            Console.Write(drawStr);
+        }
+
+        public void WriteCharacter(char ch, int x, int y, ConsoleColor color = ConsoleColor.Gray)
+        {
+            if (this.Display[x, y] != ch)
+            {
+                Console.SetCursorPosition(x, y);
+                Console.ForegroundColor = color;
+                Console.Write(ch);
+                this.Display[x, y] = ch;
+            }
         }
 
         private List<Node> GetSuccessors(Node node)
@@ -202,9 +226,9 @@ namespace astar
 
         private void FindPosition(Node node, out int x, out int y)
         {
-            for (x = 0; x < this.Width; ++x)
+            for (x = 0; x < this.Width; x++)
             {
-                for (y = 0; y < this.Height; ++y)
+                for (y = 0; y < this.Height; y++)
                 {
                     if (Node.ReferenceEquals(this.Nodes[x,y], node))
                         return;
