@@ -6,39 +6,31 @@ using System.Threading.Tasks;
 
 namespace astar
 {
-    class Node
+    public class Node
     {
-        private int f, g, h;
-        private int x, y;
+        public Node Parent { get; set; }
+        public int F { get; set; }
+        public int G { get; set; }
 
-        private Node parent;
-
-        public Node(int x, int y)
+        public List<Node> GetPath()
         {
-            this.x = x;
-            this.y = y;
-        }
+            List<Node> path = new List<Node>();
+            Node tempNode = this;
+            path.Add(tempNode);
 
-        public Node Parent { get { return parent; } set { parent = value; } }
-        public int F { get { return f; } set { f = value; } }
-        public int G { get { return g; } set { g = value; } }
-        public int X { get { return x; } }
-        public int Y { get { return y; } }
+            while (tempNode.Parent != null)
+            {
+                tempNode = tempNode.Parent;
+                path.Add(tempNode);
+            }
 
-        public List<Node> getSuccessors(Node[,] map)
-        {
-            List<Node> successorList = new List<Node>();
-
-            if (x > 0)
-                successorList.Add(map[x - 1, y]);
-            if (x + 1 < Map.width)
-                successorList.Add(map[x + 1, y]);
-            if (y > 0)
-                successorList.Add(map[x, y - 1]);
-            if (y + 1 < Map.height)
-                successorList.Add(map[x, y + 1]);
-
-            return successorList;
+            return path;
         }
     }
+
+    public class StartNode : Node { }
+
+    public class EndNode : Node { }
+
+    public class WallNode : Node { }
 }

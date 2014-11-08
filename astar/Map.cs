@@ -7,63 +7,70 @@ using System.Threading.Tasks;
 
 namespace astar
 {
-    static class Map
+    public class Map
     {
-        public static int width, height;
+        public Node[,] Nodes { get; private set; }
+        public int Width { get { return this.Nodes.GetLength(0); } }
+        public int Height { get { return this.Nodes.GetLength(1); } }
 
-        public static void drawPath(int mapWidth, int mapHeight, bool showCalc = false, bool showCurrPath = false, Node[,] mapToUse = null, List<Node> walls = null, Node start = null, Node end = null)
+        public Map(int width, int height)
         {
-            width = mapWidth;
-            height = mapHeight;
-            Node[,] map;
-            List<Node> wallList = walls;
-            Node startNode = start, endNode = end;
+            this.Nodes = new Node[width, height];
 
-            Random r = new Random();
+            // initialize with empty nodes
+            for (int x = 0; x < width; ++x)
+            {
+                for (int y = 0; y < height; ++y)
+                {
+                    this.Nodes[x, y] = new Node();
+                }
+            }
 
+            // random number generator
+            Random random = new Random();
+
+            // random start and end nodes
+            int startX, startY, endX, endY;
+            startX = random.Next(width);
+            startY = random.Next(height);
+            do
+            {
+                endX = random.Next(width);
+                endY = random.Next(height);
+            } while ((startX == endX) && (startY == endY));
+            this.Nodes[startX, startY] = new StartNode();
+            this.Nodes[endX, endY] = new EndNode();
+
+            // random walls
+            for (int x = 0; x < width; ++x)
+            {
+                for (int y = 0; y < height; ++y)
+                {
+                    if ((random.Next(100) < 25) && !(this.Nodes[x, y] is StartNode) && !(this.Nodes[x, y] is EndNode))
+                    {
+                        this.Nodes[x, y] = new WallNode();
+                    }
+                }
+            }
+        }
+
+        public void FindPath(bool showCalc = false, bool showCurrPath = false)
+        {
             List<Node> openList = new List<Node>();
             List<Node> closedList = new List<Node>();
 
-            if (mapToUse == null)
-            {
-                map = new Node[width, height];
+            // find start and end nodes
+            Node startNode = this.Nodes.Cast<Node>().First(node => node is StartNode);
+            Node endNode = this.Nodes.Cast<Node>().First(node => node is EndNode);
+            int endX, endY; this.FindPosition(endNode, out endX, out endY);
 
-                wallList = new List<Node>();
+            // add walls to closed list
+            var walls = from Node node in this.Nodes
+                        where node is WallNode
+                        select node;
+            closedList.AddRange(walls);
 
-                for (int i = 0; i < width; i++)
-                {
-                    for (int j = 0; j < height; j++)
-                    {
-                        map[i, j] = new Node(i, j);
-                    }
-                }
-
-                startNode = map[r.Next(width), r.Next(height)];
-                do
-                {
-                    endNode = map[r.Next(width), r.Next(height)];
-                } while (endNode == startNode);
-
-                foreach (Node node in map)
-                {
-                    if (r.Next(100) < 25 && node != startNode && node != endNode)
-                    {
-                        wallList.Add(node);
-                    }
-                }
-            }
-            else
-            {
-                map = mapToUse;
-            }
-
-            foreach (Node wall in wallList)
-            {
-                closedList.Add(wall);
-            }
-
-            List<Node> path = new List<Node>();
-
+            // start with start node
             Node currentNode = startNode;
 
             if (!openList.Contains(startNode))
@@ -83,10 +90,13 @@ namespace astar
 
                 openList.Remove(currentNode);
 
-                foreach (Node node in currentNode.getSuccessors(map))
+                foreach (Node node in this.GetSuccessors(currentNode))
                 {
+                    int nodeX, nodeY;
+                    this.FindPosition(currentNode, out nodeX, out nodeY);
+
                     int g = currentNode.G + 1;
-                    int h = Math.Abs(node.X - endNode.X) + Math.Abs(node.Y - endNode.Y);
+                    int h = Math.Abs(nodeX - endX) + Math.Abs(nodeY - endY);
                     int f = g + h;
 
                     if (closedList.Contains(node))
@@ -110,71 +120,53 @@ namespace astar
                         }
                     }
 
-                    if (node == endNode)
+                    if (Node.ReferenceEquals(node, endNode))
                     {
-                        path = getPath(node);
-                        goto end;
+                        this.RenderMap(openList, closedList, currentNode, false, true);
+                        return;
                     }
-                    else if (showCalc == true)
+                    else if (showCalc)
                     {
-                        path = getPath(node);
-                        draw(showCalc, showCurrPath, map, wallList, startNode, endNode, openList, closedList, path);
+                        this.RenderMap(openList, closedList, currentNode, showCalc, showCurrPath);
                         Thread.Sleep(100);
                     }
                 }
 
-
                 if (!closedList.Contains(currentNode))
                     closedList.Add(currentNode);
             }
-
-        end:
-
-            draw(showCalc, true, map, wallList, startNode, endNode, openList, closedList, path);
-            Console.Write("Press R to show new map, T to show A* calculation, or anything else to exit...");
-
-            switch (Console.ReadKey().Key)
-            {
-                case ConsoleKey.R:
-                    drawPath(width, height);
-                    break;
-                case ConsoleKey.T:
-                    drawPath(width, height, true, true, map, wallList, startNode, endNode);
-                    break;
-                case ConsoleKey.Y:
-                    drawPath(width, height, true, false, map, wallList, startNode, endNode);
-                    break;
-            }
         }
 
-        private static void draw(bool showCalc, bool showCurrPath, Node[,] map, List<Node> wallList, Node startNode, Node endNode, List<Node> openList, List<Node> closedList, List<Node> path)
+        private void RenderMap(List<Node> openList, List<Node> closedList, Node currentNode, bool showCalc, bool showCurrPath)
         {
+            List<Node> path = currentNode.GetPath();
+
             string drawStr = "";
-            for (int j = 0; j < height; j++)
+            for (int j = 0; j < this.Height; j++)
             {
-                for (int i = 0; i < width; i++)
+                for (int i = 0; i < this.Width; i++)
                 {
-                    if (map[i, j] == startNode)
+                    if (this.Nodes[i, j] is StartNode)
                     {
                         drawStr += "S";
                     }
-                    else if (map[i, j] == endNode)
+                    else if (this.Nodes[i, j] is EndNode)
                     {
                         drawStr += "E";
                     }
-                    else if (wallList.Contains(map[i, j]))
+                    else if (this.Nodes[i, j] is WallNode)
                     {
                         drawStr += "|";
                     }
-                    else if (showCurrPath && path.Contains(map[i, j]))
+                    else if (showCurrPath && path.Contains(this.Nodes[i, j]))
                     {
                         drawStr += "O";
                     }
-                    else if (openList.Contains(map[i, j]) && showCalc)
+                    else if (openList.Contains(this.Nodes[i, j]) && showCalc)
                     {
                         drawStr += ",";
                     }
-                    else if (closedList.Contains(map[i, j]) && showCalc)
+                    else if (closedList.Contains(this.Nodes[i, j]) && showCalc)
                     {
                         drawStr += ".";
                     }
@@ -189,19 +181,36 @@ namespace astar
             Console.Write(drawStr);
         }
 
-        private static List<Node> getPath(Node node)
+        private List<Node> GetSuccessors(Node node)
         {
-            List<Node> path = new List<Node>();
-            Node tempNode = node;
-            path.Add(tempNode);
+            int x, y;
+            this.FindPosition(node, out x, out y);
 
-            while (tempNode.Parent != null)
+            List<Node> successorList = new List<Node>();
+
+            if (x > 0)
+                successorList.Add(this.Nodes[x - 1, y]);
+            if (x + 1 < this.Width)
+                successorList.Add(this.Nodes[x + 1, y]);
+            if (y > 0)
+                successorList.Add(this.Nodes[x, y - 1]);
+            if (y + 1 < this.Height)
+                successorList.Add(this.Nodes[x, y + 1]);
+
+            return successorList;
+        }
+
+        private void FindPosition(Node node, out int x, out int y)
+        {
+            for (x = 0; x < this.Width; ++x)
             {
-                tempNode = tempNode.Parent;
-                path.Add(tempNode);
+                for (y = 0; y < this.Height; ++y)
+                {
+                    if (Node.ReferenceEquals(this.Nodes[x,y], node))
+                        return;
+                }
             }
-
-            return path;
+            throw new Exception("Node not in map.");
         }
     }
 }
